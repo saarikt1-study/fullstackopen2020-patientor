@@ -20,7 +20,7 @@ const PatientPage: React.FC = () => {
 
           dispatch(updatePatient(newPatient));
         } catch(error) {
-          console.error(error);
+          console.error(error.message);
         }
       };
       fetchPatient();
@@ -31,43 +31,35 @@ const PatientPage: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  // const {gender, dateOfBirth, occupation, entries, name, ssn} = patient;
-
   const assertNever = (value: never): never => {
     throw new Error(
       `Unhandled discriminated union member: ${JSON.stringify(value)}`
-    );
-  };
+      );
+    };
+    
+    const iconGender = (gender: Gender) => {
+      switch (gender) {
+        case Gender.Male:
+          return 'mars';
+        case Gender.Female:
+          return 'venus';
+        case Gender.Other:
+          return 'genderless';
+        default:
+          return assertNever(gender);
+      }
+    };
+            
+  const {name, gender, dateOfBirth, ssn, occupation, entries} = patient;
 
-  const iconGender = (gender: Gender) => {
-    switch(gender) {
-      case Gender.Male:
-        return 'mars';
-      case Gender.Female:
-        return 'venus';
-      case Gender.Other:
-        return 'genderless';
-      default:
-        return assertNever(gender);
-    }
-  };
-  
   return (
     <div className="App">
-      <p>Hello Patients! {patient.name}</p>
-      <h2>{patient.name}</h2>
-      <p>ssn: {patient.ssn}</p>
-      <p>occupation: {patient.occupation}</p>
-      {/* <div>
-        <h2>
-          {name} <Icon name={iconGender(gender)} />
-        </h2>
-      </div>
-      <div>
-        Date of birth: {dateOfBirth} <br />
-        SSN: {ssn} <br />
-        Occupation: {occupation} <br />
-      </div> */}
+      <h2>
+        {name} <Icon name={iconGender(gender)} />
+      </h2>
+      <p>Date of birth: {dateOfBirth}</p>
+      <p>SSN: {ssn}</p>
+      <p>Occupation: {occupation}</p>
     </div>
   );
 };

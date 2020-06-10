@@ -1,29 +1,31 @@
 import React, { FC } from 'react'
 import { Icon } from "semantic-ui-react";
 import { useParams } from 'react-router-dom';
-import { useStateValue } from '../state';
-import { Gender } from '../types';
+import { useStateValue, updatePatient } from '../state';
+import { Gender, Patient } from '../types';
 import axios from 'axios'
+import { apiBaseUrl } from '../constants';
 
 const PatientPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [{ patients }, dispatch] = useStateValue();
   const patient = patients[id];
 
-  // React.useEffect(() => {
-  //   if(patient && !patient.ssn){
-  //     const fetchPatient = async () => {
-  //       try{
-  //         const { data: newPatientFromApi } = await axios
-  //           .get<PatientEntry>(`api/patients/${patient.id}`);
-  //         dispatch(updatePatient(newPatientFromApi));
-  //       } catch(error) {
-  //         console.error(error);
-  //       }
-  //     };
-  //     fetchPatient();
-  //   }
-  // }, [patient, dispatch]);
+  React.useEffect(() => {
+    if(patient && !patient.ssn){
+      const fetchPatient = async () => {
+        try{
+          const { data: newPatient } = await axios
+            .get<Patient>(`${apiBaseUrl}/patients/${patient.id}`);
+
+          dispatch(updatePatient(newPatient));
+        } catch(error) {
+          console.error(error);
+        }
+      };
+      fetchPatient();
+    }
+  }, [patient, dispatch]);
 
   if(!patient) {
     return <div>Loading...</div>;
@@ -52,7 +54,10 @@ const PatientPage: React.FC = () => {
   
   return (
     <div className="App">
-      <p>Hello Patients!</p>
+      <p>Hello Patients! {patient.name}</p>
+      <h2>{patient.name}</h2>
+      <p>ssn: {patient.ssn}</p>
+      <p>occupation: {patient.occupation}</p>
       {/* <div>
         <h2>
           {name} <Icon name={iconGender(gender)} />

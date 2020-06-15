@@ -5,8 +5,9 @@ import { useStateValue, updatePatient } from '../state';
 import { Gender, Patient } from '../types';
 import axios from 'axios'
 import { apiBaseUrl } from '../constants';
+import EntryDetails from './Entry';
 
-const PatientPage: React.FC = () => {
+const PatientPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const [{ patients }, dispatch] = useStateValue();
   const patient = patients[id];
@@ -60,6 +61,8 @@ const PatientPage: React.FC = () => {
       <p>Date of birth: {dateOfBirth}</p>
       <p>SSN: {ssn}</p>
       <p>Occupation: {occupation}</p>
+      <h3>Entries</h3>
+      {entries && entries.map(e => <EntryDetails key={e.id} entry={e} />)}
     </div>
   );
 };

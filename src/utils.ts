@@ -1,8 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { NewPatientEntry, Gender } from './types';
+import { 
+  NewPatientEntry,
+  Gender,
+  NewBaseEntry,
+  HospitalEntry,
+  HealthCheckEntry,
+  OccupationalHealthcareEntry,
+  HealthCheckRating,
+  Entry
+} from './types';
 
 const toNewPatientEntry = (object: any): NewPatientEntry => {
   const newEntry: NewPatientEntry = {
@@ -10,11 +20,101 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
     dateOfBirth: parseDate(object.dateOfBirth),
     ssn: parseSsn(object.ssn),
     gender: parseGender(object.gender),
-    occupation: parseOccupation(object.occupation)
+    occupation: parseOccupation(object.occupation),
+    entries: []
   };
   
   return newEntry;
-}; 
+};
+
+export const toNewDiagnosticEntry = (object: any): Entry => {
+  const newEntry: NewBaseEntry = {
+    date: parseDate(object.type),
+    description: parseDescription(object.description),
+    specialist: parseSpecialist(object.specialist)
+  };
+
+  if(object.diagnosisCodes) {
+    newEntry.diagnosisCodes = parseDiagnoseCodes(object.diagnosisCodes);
+  }
+
+  const id: string = new Date().getTime().toString();
+  const type = parseType(object.type);
+
+  switch(type) {
+    case "Hospital":
+      const newHospitalEntry: HospitalEntry = {
+        ...newEntry,
+        discharge: {
+          date: parseDate(object.discharge.date),
+          criteria: parseCriteria(object.discharge.criteria)
+        },
+        id, type
+      };
+      return newHospitalEntry;
+
+    case "HealthCheck":
+      const newHealthCheckEntry: HealthCheckEntry = {
+        ...newEntry,
+        healthCheckRating: parseHealthCheckRating(object.healthCheckRating),
+        id, type
+      };
+      return newHealthCheckEntry;
+
+    case "OccupationalHealthcare":
+      const newOccupationalHealthcareEntry: OccupationalHealthcareEntry = {
+        ...newEntry,
+        employerName: parseEmployerName(object.employerName),
+        id, type
+      };
+
+      if(object.sickLeave) {
+        newOccupationalHealthcareEntry.sickLeave = {
+          startDate: parseDate(object.sickLeave.startDate),
+          endDate: parseDate(object.sickLeave.endDate)
+        };
+      }
+
+      return newOccupationalHealthcareEntry;
+      
+    default:
+      return assertNever(type);
+  }
+};
+
+const assertNever = (value: never): never => {
+  throw new Error(
+    `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    );
+  };
+
+const parseType = (type: string): "Hospital" | "OccupationalHealthcare" | "HealthCheck"  => {
+  if(type === "Hospital" || type === "OccupationalHealthcare" || type === "HealthCheck") {
+    return type;
+  }
+  throw new Error (`Incorrect or unsupported entry type: ${type}`);
+};
+
+const parseDiagnoseCodes = (codes: string[]): string[] | undefined => {
+  if(codes && (!Array.isArray(codes) || !codes.map(code => !isString(code)))) {
+    throw new Error(`Incorrect or missing list of diagnosis codes ${String(codes)}`);
+  }
+  return codes;
+};
+
+const parseDescription = (description: string): string => {
+  if(!description || !isString(description)) {
+    throw new Error(`Incorrect or missing description: ${description}`);
+  }
+  return description;
+};
+
+const parseSpecialist = (specialist: string): string => {
+  if(!specialist || !isString(specialist)) {
+    throw new Error(`Incorrect or missing specialist: ${specialist}`);
+  }
+  return specialist;
+};
 
 const isDate = (date: string): boolean => {
   return Boolean(Date.parse(date));
@@ -25,6 +125,35 @@ const parseDate = (date: any): string => {
       throw new Error('Incorrect or missing date');
   }
   return date;
+};
+
+const parseCriteria = (criteria: any): string => {
+  if(!criteria || !isString(criteria)) {
+    throw new Error(`Incorrect or missing criteria: ${String(criteria)}`);
+  }
+  return criteria;
+};
+
+const parseEmployerName = (employerName: any): string => {
+  if(!employerName || !isString(employerName)) {
+    throw new Error(`Incorrect or missing employer name: ${String(employerName)}`);
+  }
+  return employerName;
+};
+
+const parseHealthCheckRating = (healthCheckRating: any): HealthCheckRating => {
+  if(healthCheckRating === undefined
+    || !Number.isInteger(Number(healthCheckRating))
+    || !isHealthCheckRating(healthCheckRating)
+  ) {
+    throw new Error(`Incorrect or missing health check rating ${String(healthCheckRating)}`);
+  }
+
+  return Number(healthCheckRating);
+};
+
+const isHealthCheckRating = (param: any): param is HealthCheckRating => {
+  return Object.values(HealthCheckRating).includes(param);
 };
 
 const parseName = (name: any): string => {

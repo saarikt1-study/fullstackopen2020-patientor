@@ -39,7 +39,14 @@ router.post('/', (req, res) => {
 router.post('/:id/entries', (req, res) => {
   const { id } = req.params;
   try {
-    const newEntry = patientService.toNewDiagnosticEntry();
+    const newEntry = toNewDiagnosticEntry(req.body);
+    const patient = patientService.addEntry(id, newEntry);
+
+    if(!patient) {
+      res.status(404).send({error: "Could not find the patient from our database"});
+    }
+    
+    res.send(patient);
   }
   catch (e) {
     res.status(400).send(e);

@@ -53,6 +53,8 @@ export interface OccupationalHealthcareEntry extends BaseEntry {
   }
 }
 
+export type NewHospitalEntry = Omit<HospitalEntry, 'id'>
+
 export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry

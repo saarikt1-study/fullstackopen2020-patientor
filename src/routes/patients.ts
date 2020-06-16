@@ -39,7 +39,9 @@ router.post('/', (req, res) => {
 router.post('/:id/entries', (req, res) => {
   const { id } = req.params;
   try {
+    console.log('NewEntry: ', req.body);
     const newEntry = toNewDiagnosticEntry(req.body);
+
     const patient = patientService.addEntry(id, newEntry);
 
     if(!patient) {
@@ -49,7 +51,7 @@ router.post('/:id/entries', (req, res) => {
     res.send(patient);
   }
   catch (e) {
-    res.status(400).send(e);
+    res.status(400).send(e.message);
   }
 });
 

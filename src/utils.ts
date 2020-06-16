@@ -29,7 +29,7 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
 
 export const toNewDiagnosticEntry = (object: any): Entry => {
   const newEntry: NewBaseEntry = {
-    date: parseDate(object.type),
+    date: parseDate(object.date),
     description: parseDescription(object.description),
     specialist: parseSpecialist(object.specialist)
   };
@@ -121,6 +121,7 @@ const isDate = (date: string): boolean => {
 };
 
 const parseDate = (date: any): string => {
+  console.log('Parse this date: ', isDate(date));
   if (!date || !isString(date) || !isDate(date)) {
       throw new Error('Incorrect or missing date');
   }

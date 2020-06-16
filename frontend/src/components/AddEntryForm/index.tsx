@@ -1,15 +1,10 @@
 import React from 'react';
 import { useStateValue } from '../../state';
-import { Segment } from "semantic-ui-react";
 import { Grid, Button } from "semantic-ui-react";
 import { Field, Formik, Form } from "formik";
 import { NewHospitalEntry, Diagnosis } from '../../types'
 
 import { TextField, DiagnosisSelection } from "../../AddPatientModal/FormField";
-
-// interface Props {
-//   onSubmit: (values: NewEntryType) => void;
-// }
 
 interface Props {
   onSubmit: (values: NewHospitalEntry) => void;
@@ -18,29 +13,6 @@ interface Props {
 
 const AddEntryForm: React.FC<Props> = ({ onSubmit, diagnosis }) => {
   const [{ diagnose }] = useStateValue();
-  const [type, setType] = React.useState<NewHospitalEntry['type']>("Hospital")
-
-  // const selectForm = () => {
-  //   switch(type) {
-  //     case "HealthCheck":
-  //       return <AddHealthCheckForm
-  //         onSubmit={onSubmit}
-  //         diagnosis={diagnosis}
-  //       />
-  //     case "Hospital":
-  //       return <AddHosptialEntryForm
-  //         onSubmit={onSubmit}
-  //         diagnosis={diagnosis}
-  //       />
-  //     case "OccupationalHealthcare":
-  //       return <AddOccupationalHealthcareEntryForm
-  //         onSubmit={onSubmit}
-  //         diagnosis={diagnosis}
-  //       />
-  //     default:
-  //       return assertNever(type);
-  //   }
-  // }
 
   return(
     <div>
@@ -128,17 +100,6 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, diagnosis }) => {
         );
       }}
     </Formik>
-      {/* <select
-        value={type}
-        onChange={({ target }) => setType(target.value as NewEntryType['type'])}
-      >
-        <option value="HealthCheck">HealthCheck</option>
-        <option value="Hospital">Hospital</option>
-        <option value="OccupationalHealthcare">Occupational Healthcare</option>
-      </select> */}
-      {/* <Segment>
-        {selectForm()}
-      </Segment> */}
     </div>
   );
 }
